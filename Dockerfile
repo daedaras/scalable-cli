@@ -13,7 +13,12 @@ RUN apk add --no-cache ca-certificates tzdata
 # Copy the compiled binary from the builder stage
 COPY --from=builder /build/target/release/sc /usr/local/bin/sc
 
-# Copy the entrypoint script
+# Create config directory and force file-based storage backend (disables D-Bus keyring requirement)
+RUN mkdir -p /root/.config/scalable-cli && \
+    echo '[auth]' > /root/.config/scalable-cli/config.toml && \
+    echo 'session_backend = "file"' >> /root/.config/scalable-cli/config.toml
+
+# Copy entrypoint script
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
